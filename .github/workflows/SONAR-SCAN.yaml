@@ -23,4 +23,4 @@ jobs:
           -e SONAR_TOKEN="$env:SONAR_TOKEN" `
           -v "${env:GITHUB_WORKSPACE}:/usr/src" `
           sonarsource/sonar-scanner-cli `
-          -Dsonar.qualitygate.wait=true
+          "-Dsonar.qualitygate.wait=true"
