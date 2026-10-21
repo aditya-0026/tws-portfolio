@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    runs-on: ubuntu-latest   # change to self-hosted if SonarQube runs on your laptop
+    runs-on: self-hosted   # change to self-hosted if SonarQube runs on your laptop
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
