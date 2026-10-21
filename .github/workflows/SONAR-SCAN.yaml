@@ -1,4 +1,4 @@
-name: CI/CD workflow for Maven Build and Sonar Code scan
+name: Sonar Code scan
 on:
   push:
     branches:
@@ -6,26 +6,19 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest   # change to self-hosted if SonarQube runs on your laptop
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Set up JDK 17
-      uses: actions/setup-java@v5
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-        cache: 'maven'
-        cache-dependency-path: MyWebApp/pom.xml
-    - name: Build with Maven
-      run: mvn clean install -f MyWebApp/pom.xml
-    - name: SonarQube Scan with Quality Gate
-      run: |
-        mvn -f MyWebApp/pom.xml sonar:sonar \
-          -Dsonar.projectKey=MyWebApp \
-          -Dsonar.projectName=MyWebApp \
-          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-          -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
-          -Dsonar.qualitygate.wait=true
+    - name: SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@v5
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+    - name: Quality Gate
+      uses: SonarSource/sonarqube-quality-gate-action@master
+      timeout-minutes: 5
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
