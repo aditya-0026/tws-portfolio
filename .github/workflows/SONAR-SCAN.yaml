@@ -6,19 +6,21 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    runs-on: self-hosted   # change to self-hosted if SonarQube runs on your laptop
+    runs-on: self-hosted
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
     - name: SonarQube Scan
-      uses: SonarSource/sonarqube-scan-action@v5
+      shell: powershell
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-    - name: Quality Gate
-      uses: SonarSource/sonarqube-quality-gate-action@master
-      timeout-minutes: 5
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        docker run --rm `
+          -e SONAR_HOST_URL="http://host.docker.internal:9000" `
+          -e SONAR_TOKEN="$env:SONAR_TOKEN" `
+          -v "${env:GITHUB_WORKSPACE}:/usr/src" `
+          sonarsource/sonar-scanner-cli `
+          -Dsonar.qualitygate.wait=true
